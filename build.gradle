@@ -1,0 +1,50 @@
+plugins {
+	id "com.github.johnrengelman.shadow" version "1.2.3"
+}
+
+apply plugin: 'application'
+apply plugin: 'java'
+apply plugin: "com.github.johnrengelman.shadow"
+
+archivesBaseName = 'JavaServant'
+version = '0.5.0'
+mainClassName="javaservant.core.JavaServant"
+
+repositories {
+	mavenCentral()
+	jcenter()
+	maven {
+		url "https://repo.fugu.io/artifactory/gradle-libs"
+	}
+}
+
+jar {
+	include('resources/*')
+	manifest {
+		attributes 'Main-Class': 'javaservant.core.JavaServant'
+	}
+}
+
+dependencies {
+	compile 'com.1stleg:jnativehook:2.0.2'
+	compile files('./lib/CustomUtils_2016_05_04.jar', './lib/jfxswt.jar')
+}
+
+task copyWebSources(type: Copy) {
+	into 'src/main/resources/web'
+	from 'src/main/web/'
+}
+
+
+compileJava {
+	dependsOn copyWebSources
+}
+
+//task copyScripts (type: Copy){
+//	from 'scripts'
+//	into 'build/installShadow/JServant/lib/scripts'
+//}
+
+//runShadow {
+//	dependsOn copyScripts
+//}

@@ -6,7 +6,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,13 +18,30 @@ import java.util.logging.Logger;
  */
 public class JSThread extends Thread {
     private final static Logger LOG = Logger.getLogger(JSThread.class.getName());
+    public static final String NOT_RUNNING = "Not Running";
+    public static final String RUNNING = "Running";
+    public static final String SUCCEEDED = "Succeeded";
+    public static final String FAILED = "Failed";
+    public static final String STOPPED = "Stopped";
+    public static final String READY = "Ready";
+    public static final String[] STATE_LIST = {NOT_RUNNING, RUNNING, SUCCEEDED, FAILED, STOPPED, READY};
+
+    enum RUN_STATES {
+        NOT_RUNNING,
+        RUNNING,
+        SUCCEEDED,
+        FAILED
+    }
+
     File script;
     SuperRobot bot;
     public boolean running;
+    List<JSThreadListener> subscribers;
 
     public JSThread(SuperRobot bot, File s) {
         this.bot = bot;
         script = s;
+        subscribers = new ArrayList<>();
     }
 
     @Override
@@ -148,19 +167,31 @@ public class JSThread extends Thread {
                 lineNum++;
             }
             br.close();
+            broadcastState(SUCCEEDED, null);
         }
         catch(FileNotFoundException | IllegalArgumentException fnfe){
             fnfe.printStackTrace();
             LOG.log(Level.SEVERE, fnfe.getMessage());
+            broadcastState(FAILED, fnfe.getMessage());
         } catch(Exception e) {
-            LOG.log(Level.SEVERE, "Fatal Error, closing application due to: " + e.getMessage());
+            LOG.log(Level.SEVERE, "Fatal Error, due to: " + e.getMessage());
             e.printStackTrace();
-            System.exit(0);
+            broadcastState(FAILED, e.getMessage());
         }
-        finally
-        {
+        finally {
             running = false;
             LOG.info("Thread " + this + " has finished running");
         }
     }
+
+    private void broadcastState(String newState, String message) {
+        for (JSThreadListener subscriber : subscribers) {
+            subscriber.onJsThreadStateChange(newState, message);
+        }
+    }
+
+    public void addSubscriber(JSThreadListener subscriber) {
+        subscribers.add(subscriber);
+    }
+
 }

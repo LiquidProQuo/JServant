@@ -7,6 +7,10 @@
     <link href='http://fonts.googleapis.com/css?family=Roboto:300' rel='stylesheet' type='text/css'>
     <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="javabridge.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+    <script src="jservant.js"></script>
+    <script type="text/javascript" src="https://getfirebug.com/firebug-lite.js"></script>
     <style>
         body{
             font:12px/15px Roboto, "Helvetica Neue", Helvetica, sans-serif;
@@ -42,25 +46,23 @@
             height:5px;
             display:inline-block;
         }
+        .errorRunning {
+            color: #fa1111
+        }
+        .successRunning {
+            color: #11fc11
+        }
+        .notRunning {
+            color: #010101
+        }
+        .running {
+            color: #0101fb
+        }
     </style>
 </head>
-<body>
-<script>
-function newAccount() {
-    var firstName = document.getElementById("firstname").value;
-    var lastName = document.getElementById("lastname").value;
-    var phone = document.getElementById("phone").value;
-    var email = document.getElementById("email").value;
-    AccountService.createAccount(firstName, lastName, phone, email);
-}
-
-var selectedScript = "(None)";
-function loadScript() {
-    selectedScript =  document.getElementById('scriptSelect').value;
-    javaServant.loadScript(selectedScript);
-}
-</script>
+<body ng-app="JServant" ng-controller="JServantCtrl">
 <div id="wrapper">
+    <input hidden="false" id="scriptStatusListener"  ng-model="currentScriptStatus" ng-change="updateScriptStatus()"/>
     <div class="dividerVertical"></div>
     <div class="main-form">
         <form action="#" method="POST">
@@ -84,18 +86,25 @@ function loadScript() {
                         <input class="form-control" type="email" id="email" name="email" placeholder="Email">
                     </div>
                     -->
-                    <label for="scriptSelect">Select a script: </label>
                     <div class="form-group">
-                        <select class="form-control" id="scriptSelect"
-                                onchange="loadScript();">
+                        <label for="scriptSelect">Select a script: </label>
+                        <div class="divider"></div>
+                        <label for="scriptSelect" id="scriptName" name="scriptName">
+                            <i>{{currentScriptName}}</i>
+                        </label>
+                        <div class="divider"></div>
+                        <label for="scriptSelect" id="scriptStatus" name="scriptStatus" class="{{runningState()}}">
+                            <b>{{currentScriptStatus}}</b>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <select class="form-control" id="scriptSelect" onchange="loadScript();" ng-model="currentScriptName">
                             <option>(None)</option>
-                            <option>test.txt</option>
-                            <option>test2.txt</option>
                         </select>
                     </div>
                     <div class="form-group text-center">
                         <button class="btn btn-danger btn-lg" type="button" onclick="javaServant.stopScript();">Stop</button>
-                       <div class="divider"></div>
+                        <div class="divider"></div>
                         <button class="btn btn-info btn-lg" type="button" onclick="javaServant.runScript();">Run</button>
                     </div>
                 </div>

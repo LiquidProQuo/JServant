@@ -172,7 +172,12 @@ public class JavaServant extends Application {
     			script = null;
     			str = NO_SCRIPT_TEXT;
     		} else {
-    			script = new File(DEFAULT_FILE_DIRECTORY + "/" + fileName);
+				File file = new File(DEFAULT_FILE_DIRECTORY + "/" + fileName);
+				if (!file.exists()) {
+					LOG.warning("File at " +  DEFAULT_FILE_DIRECTORY + "/" + fileName + " does not exist! Exiting.");
+					return NO_SCRIPT_TEXT;
+				}
+    			script = file;
     			str = script.getName();
     		}
     	}
@@ -180,21 +185,26 @@ public class JavaServant extends Application {
     }
 
     //TODO: When a script generates an exception, we need to display this to the UI
-    public void runScript() {
+    public boolean runScript() {
         if(script != null && (thread == null || !thread.running)) {
         	LOG.info("New Thread request to start running via start button.");
             thread = new JSThread(bot, script);
             thread.start();
+			return true;
         }
+		return false;
     }
 
-    public void stopScript() {
+    public boolean stopScript() {
         if (thread != null && thread.isAlive()) {
 			thread.interrupt();
 			thread.running = false;
             LOG.info("Request " + thread.toString() + "stop running via stop button.");
+			thread = null;
+			return true;
         }      
         thread = null;
+		return false;
     }
     
     public static void main(String [] args) {
@@ -206,4 +216,8 @@ public class JavaServant extends Application {
     		js.runScript();
     	}
     }
+
+	public JSThread getThread() {
+		return thread;
+	}
 }
