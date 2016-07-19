@@ -32,13 +32,23 @@ public class JavaServant extends Application {
 	private static final String SCRIPT_EXTENSION = "txt"; //TODO: maybe different extension
 	private static final String SCRIPT_EXTENSION_TITLE = "JServant Scripts";
 	public static final String DEFAULT_FILE_DIRECTORY = "scripts";
-	public static final String FRAME_TITLE = "Java Servant (Beta)";
-	
+	public static final String APP_VERSION = "0.5 (Beta)";
+	public static final String FRAME_TITLE = "Java Servant " + APP_VERSION;
 	private final static Logger LOG = Logger.getLogger(JavaServant.class.getName());
+
+	enum SCRIPT_STATE {
+		NONE,
+		READY,
+		RUNNING,
+		SUCCEEDED,
+		FAILED,
+		STOPPED
+	}
 
     private SuperRobot bot;
     private File script;
     private JSThread thread;
+	private volatile static SCRIPT_STATE scriptState;
     
     
     public JavaServant() {
@@ -171,6 +181,7 @@ public class JavaServant extends Application {
     		if(NONE.equals(fileName)) {
     			script = null;
     			str = NO_SCRIPT_TEXT;
+				JavaServant.setScriptState(SCRIPT_STATE.NONE);
     		} else {
 				File file = new File(DEFAULT_FILE_DIRECTORY + "/" + fileName);
 				if (!file.exists()) {
@@ -179,12 +190,12 @@ public class JavaServant extends Application {
 				}
     			script = file;
     			str = script.getName();
+				JavaServant.setScriptState(SCRIPT_STATE.READY);
     		}
     	}
     	return str;
     }
 
-    //TODO: When a script generates an exception, we need to display this to the UI
     public boolean runScript() {
         if(script != null && (thread == null || !thread.running)) {
         	LOG.info("New Thread request to start running via start button.");
@@ -201,6 +212,7 @@ public class JavaServant extends Application {
 			thread.running = false;
             LOG.info("Request " + thread.toString() + "stop running via stop button.");
 			thread = null;
+			JavaServant.setScriptState(SCRIPT_STATE.STOPPED);
 			return true;
         }      
         thread = null;
@@ -219,5 +231,19 @@ public class JavaServant extends Application {
 
 	public JSThread getThread() {
 		return thread;
+	}
+
+	public SCRIPT_STATE getScriptState() {
+		return scriptState;
+	}
+
+	public synchronized static void setScriptState(SCRIPT_STATE newState) {
+		scriptState = newState;
+	}
+	public String getThreadStateDescription() {
+		if (scriptState == SCRIPT_STATE.NONE) {
+			return "NO SCRIPT LOADED";
+		}
+		return scriptState.name();
 	}
 }

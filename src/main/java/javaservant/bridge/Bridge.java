@@ -1,6 +1,5 @@
 package javaservant.bridge;
 
-import javaservant.core.JSThread;
 import javaservant.core.JavaServant;
 import javaservant.view.JServantWebFrame;
 
@@ -19,27 +18,20 @@ public class Bridge {
 	public void runScript() {
 		System.out.println("Run Script Called!");
 		boolean success = js.runScript();
-		if (success) {
-			js.getThread().addSubscriber(frame);
-			frame.updateRunState(JSThread.RUNNING);
-		}
 	}
 
 	public void stopScript() {
 		System.out.println("Stop Script Called!");
-		boolean success = js.stopScript();
-		if (success) {
-			frame.updateRunState(JSThread.STOPPED);
-		}
+		js.stopScript();
+		frame.resize(null, (int)frame.getHeight() + JServantWebFrame.HEIGHT_INCREMENT_AMOUNT);
 	}
 
 	public void loadScript(String selectedScript) {
 		System.out.println("Load Script Called!: " + selectedScript.toString());
-		String result = js.loadDropDownScript(selectedScript.toString(), selectedScript.toString());
-		if (!JavaServant.NO_SCRIPT_TEXT.equals(result)) {
-			frame.updateRunState(JSThread.READY);
-		} else {
-			frame.updateRunState(JSThread.NOT_RUNNING);
-		}
+		js.loadDropDownScript(selectedScript.toString(), selectedScript.toString());
+	}
+
+	public void updateScriptRunState() {
+		frame.updateRunState(js.getThreadStateDescription());
 	}
 }

@@ -2,7 +2,8 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>JServant (Beta)</title>
+    <title>JServant v.0.5 (Beta)</title>
+    <!--TODO: download these all locally so this is useable w/o being online-->
     <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
     <link href='http://fonts.googleapis.com/css?family=Roboto:300' rel='stylesheet' type='text/css'>
     <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
@@ -10,7 +11,9 @@
     <script src="javabridge.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
     <script src="jservant.js"></script>
+    <!-- Stopped working for some reason
     <script type="text/javascript" src="https://getfirebug.com/firebug-lite.js"></script>
+    -->
     <style>
         body{
             font:12px/15px Roboto, "Helvetica Neue", Helvetica, sans-serif;
@@ -34,6 +37,9 @@
         }
         .form-logo {
             font-size: 100px;
+            color: #708090;
+        }
+        .button-logo {
             color: #708090;
         }
         .divider{
@@ -62,7 +68,6 @@
 </head>
 <body ng-app="JServant" ng-controller="JServantCtrl">
 <div id="wrapper">
-    <input hidden="false" id="scriptStatusListener"  ng-model="currentScriptStatus" ng-change="updateScriptStatus()"/>
     <div class="dividerVertical"></div>
     <div class="main-form">
         <form action="#" method="POST">
@@ -90,12 +95,42 @@
                         <label for="scriptSelect">Select a script: </label>
                         <div class="divider"></div>
                         <label for="scriptSelect" id="scriptName" name="scriptName">
-                            <i>{{currentScriptName}}</i>
+                            <i>{{currentScriptName | limitTo: 20}}</i>
                         </label>
                         <div class="divider"></div>
                         <label for="scriptSelect" id="scriptStatus" name="scriptStatus" class="{{runningState()}}">
                             <b>{{currentScriptStatus}}</b>
                         </label>
+                        <!--<div class="divider"></div>
+                        <button class="btn btn-success btn-xs">
+                            <span class="glyphicon glyphicon-plus"/>
+                        </button>-->
+                    </div>
+                    <div id="varsHolder">
+                        <li ng-repeat="variable in vars">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-10">
+                                                <label for="var_{{variable.name}}">
+                                                    {{variable.value}}
+                                                </label>
+                                                <div class="divider"></div>
+                                                <input class="input-large" type="text" id="var_{{variable.name}}"
+                                                       name="var_{{variable.name}}" ng-model="variable.value">
+                                                </input>
+                                                <div class="divider"></div>
+                                                <button class="btn btn-success btn-xs">
+                                                    <span class="glyphicon glyphicon-ok"/>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dividerVertical"></div>-
+                        </li>
                     </div>
                     <div class="form-group">
                         <select class="form-control" id="scriptSelect" onchange="loadScript();" ng-model="currentScriptName">
@@ -103,9 +138,9 @@
                         </select>
                     </div>
                     <div class="form-group text-center">
-                        <button class="btn btn-danger btn-lg" type="button" onclick="javaServant.stopScript();">Stop</button>
+                        <button class="btn btn-danger btn-lg" type="button" onclick="stopScript();">Stop</button>
                         <div class="divider"></div>
-                        <button class="btn btn-info btn-lg" type="button" onclick="javaServant.runScript();">Run</button>
+                        <button class="btn btn-info btn-lg" type="button" onclick="runScript();">Run</button>
                     </div>
                 </div>
             </fieldset>

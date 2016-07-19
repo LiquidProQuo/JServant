@@ -6,7 +6,6 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javaservant.bridge.Bridge;
-import javaservant.core.JSThreadListener;
 import javaservant.core.JavaServant;
 import netscape.javascript.JSObject;
 
@@ -16,16 +15,19 @@ import java.net.URISyntaxException;
 /**
  * Created by Josh on 7/17/2016.
  */
-public class JServantWebFrame implements JSThreadListener{
+public class JServantWebFrame {
 	private static final int DEFAULT_WINDOW_HEIGHT = 385;
 	private static final int DEFAULT_WINDOW_WIDTH = 425;
+	public static final int HEIGHT_INCREMENT_AMOUNT = 46;
 	private static final String JAVASCRIPT_BRIDGE_NAME = "javaServant";
 	private static final String WEB_PATH = "web/dialog.html";
 
 	Bridge bridge;
 	WebEngine webEngine;
+	Stage primaryStage;
 
 	public void init(JavaServant js, Stage primaryStage) throws MalformedURLException, URISyntaxException {
+		this.primaryStage = primaryStage;
 		primaryStage.setTitle(JavaServant.FRAME_TITLE);
 
 		WebView browser = new WebView();
@@ -57,8 +59,21 @@ public class JServantWebFrame implements JSThreadListener{
 		webEngine.executeScript("updateScriptStatus('" + runState + "');");
 	}
 
-	@Override
-	public void onJsThreadStateChange(String newState, String message) {
-		updateRunState(newState);
+	public void resize(Integer width, Integer height) {
+		if (width != null) {
+			primaryStage.setWidth(width);
+		}
+		if (height != null) {
+			primaryStage.setHeight(height);
+		}
 	}
+
+	public double getHeight() {
+		return primaryStage.getHeight();
+	}
+
+	public double getWidth() {
+		return primaryStage.getWidth();
+	}
+
 }
