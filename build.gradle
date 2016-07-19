@@ -39,12 +39,3 @@ task copyWebSources(type: Copy) {
 compileJava {
 	dependsOn copyWebSources
 }
-
-//task copyScripts (type: Copy){
-//	from 'scripts'
-//	into 'build/installShadow/JServant/lib/scripts'
-//}
-
-//runShadow {
-//	dependsOn copyScripts
-//}

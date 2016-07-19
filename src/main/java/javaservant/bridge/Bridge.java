@@ -23,7 +23,6 @@ public class Bridge {
 	public void stopScript() {
 		System.out.println("Stop Script Called!");
 		js.stopScript();
-		frame.resize(null, (int)frame.getHeight() + JServantWebFrame.HEIGHT_INCREMENT_AMOUNT);
 	}
 
 	public void loadScript(String selectedScript) {
