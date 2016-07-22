@@ -1,6 +1,5 @@
 package bot;
 
-import com.jhs.utils.SystemUtils;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
@@ -9,6 +8,7 @@ import org.jnativehook.keyboard.NativeKeyListener;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.StringTokenizer;
@@ -672,7 +672,7 @@ public class SuperRobot extends Robot implements NativeKeyListener
             }*/
             else if ("run".equals(cmd))
             {
-                SystemUtils.run(val);
+				runApplication(val);
             }
             else if ("enter".equals(cmd)){
             	enterLiteralString(val);
@@ -755,7 +755,7 @@ public class SuperRobot extends Robot implements NativeKeyListener
             }
 
             GlobalScreen.addNativeKeyListener(this);
-            this.enterPressed = false;
+            enterPressed = false;
             
             while(!enterPressed) {
             	//just wait
@@ -774,7 +774,7 @@ public class SuperRobot extends Robot implements NativeKeyListener
 			//check if enter is pressed
 			if (e.getKeyCode() == NativeKeyEvent.VC_ENTER) {
 	            try {
-	            	this.enterPressed = true;
+	            	enterPressed = true;
 					GlobalScreen.unregisterNativeHook();
 					System.out.println("Enter Detected! Quitting listen");
 				} catch (NativeHookException e1) {
@@ -788,4 +788,28 @@ public class SuperRobot extends Robot implements NativeKeyListener
 			// TODO Auto-generated method stub
 			
 		}
+
+	/**
+	 * Will execute file at given path, returning true if successful
+	 *
+	 * @param path
+	 * @return true if successful
+	 */
+	public static boolean runApplication(String path)
+	{
+		try {
+			if (path.endsWith(".lnk")) { //separate process for shortcuts
+				new ProcessBuilder("cmd", "/c", path).start();
+			} else {
+				new ProcessBuilder(path).start();
+			}
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+
+		return true;
+	}
 }

@@ -12,14 +12,9 @@ mainClassName="javaservant.core.JavaServant"
 
 repositories {
 	mavenCentral()
-	jcenter()
-	maven {
-		url "https://repo.fugu.io/artifactory/gradle-libs"
-	}
 }
 
 jar {
-	include('resources/*')
 	manifest {
 		attributes 'Main-Class': 'javaservant.core.JavaServant'
 	}
@@ -27,10 +22,14 @@ jar {
 
 dependencies {
 	compile 'com.1stleg:jnativehook:2.0.2'
-	compile files('./lib/CustomUtils_2016_05_04.jar', './lib/jfxswt.jar')
+	compile files('./lib/jfxswt.jar')
 }
 
-task copyWebSources(type: Copy) {
+task cleanResources (type: Delete) {
+	delete fileTree(dir: "src/main/resources")
+}
+
+task copyWebSources(dependsOn: cleanResources, type: Copy) {
 	into 'src/main/resources/web'
 	from 'src/main/web/'
 }

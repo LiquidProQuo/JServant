@@ -1,1 +1,6 @@
 src/main/resources
+.idea
+.settings
+.gradle
+.project
+*.log*

@@ -1,0 +1,49 @@
+        body{
+            font:12px/15px Roboto, "Helvetica Neue", Helvetica, sans-serif;
+            background: linear-gradient(to bottom, rgba(181,189,200,1) 0%,rgba(130,140,149,1) 36%,rgba(40,52,59,1) 100%);
+        }
+        select,
+        input,
+        .btn {
+            font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+        }
+        #wrapper{
+            margin:0 auto;
+        }
+        .main-form {
+            width: 360px;
+            min-height: 360px;
+            background: #ffffff;
+            border-radius: 60px;
+            margin:0px auto 20px;
+            padding: 20px;
+        }
+        .form-logo {
+            font-size: 100px;
+            color: #708090;
+        }
+        .button-logo {
+            color: #708090;
+        }
+        .divider{
+            width:10px;
+            height:auto;
+            display:inline-block;
+        }
+        .dividerVertical{
+            width:auto;
+            height:5px;
+            display:inline-block;
+        }
+        .errorRunning {
+            color: #fa1111
+        }
+        .successRunning {
+            color: #11fc11
+        }
+        .notRunning {
+            color: #010101
+        }
+        .running {
+            color: #0101fb
+        }

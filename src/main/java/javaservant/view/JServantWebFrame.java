@@ -20,7 +20,7 @@ public class JServantWebFrame {
 	private static final int DEFAULT_WINDOW_WIDTH = 425;
 	public static final int HEIGHT_INCREMENT_AMOUNT = 46;
 	private static final String JAVASCRIPT_BRIDGE_NAME = "javaServant";
-	private static final String WEB_PATH = "web/dialog.html";
+	private static final String WEB_PATH = "web/main.html";
 
 	Bridge bridge;
 	WebEngine webEngine;
