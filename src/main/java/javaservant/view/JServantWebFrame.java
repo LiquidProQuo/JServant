@@ -1,5 +1,6 @@
 package javaservant.view;
 
+import com.google.gson.JsonObject;
 import javafx.concurrent.Worker;
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
@@ -11,6 +12,8 @@ import netscape.javascript.JSObject;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by Josh on 7/17/2016.
@@ -18,7 +21,7 @@ import java.net.URISyntaxException;
 public class JServantWebFrame {
 	private static final int DEFAULT_WINDOW_HEIGHT = 385;
 	private static final int DEFAULT_WINDOW_WIDTH = 425;
-	public static final int HEIGHT_INCREMENT_AMOUNT = 46;
+	private static final int WINDOW_HEIGHT_BUFFER = 38;
 	private static final String JAVASCRIPT_BRIDGE_NAME = "javaServant";
 	private static final String WEB_PATH = "web/main.html";
 
@@ -74,6 +77,20 @@ public class JServantWebFrame {
 
 	public double getWidth() {
 		return primaryStage.getWidth();
+	}
+
+	public void populateVariables(List<JsonObject> varMapJson) {
+		JSObject window  = (JSObject) webEngine.executeScript("window");
+		window.setMember("variableMapList", varMapJson);
+		webEngine.executeScript("populateVariableList();");
+		int windowHeight = varMapJson.isEmpty() ? DEFAULT_WINDOW_HEIGHT + WINDOW_HEIGHT_BUFFER :
+				28 + (int)webEngine.executeScript("Math.max($(document).height(), $(window).height())");
+		System.out.println("Window inner height: " + windowHeight);
+		resize(null, windowHeight);
+	}
+
+	public void resetFrame() {
+		populateVariables(Collections.EMPTY_LIST);
 	}
 
 }

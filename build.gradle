@@ -22,6 +22,7 @@ jar {
 
 dependencies {
 	compile 'com.1stleg:jnativehook:2.0.2'
+	compile 'com.google.code.gson:gson:2.7'
 	compile files('./lib/jfxswt.jar')
 }
 

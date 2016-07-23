@@ -7,8 +7,14 @@ var selectedScript = "(None)";
 
 function loadScript() {
     selectedScript =  document.getElementById('scriptSelect').value;
+
     //preset script display to prevent any lag waiting for server response
-     updateScriptStatus("READY");
+    if (selectedScript == "(None)") {
+        updateScriptStatus("NO SCRIPT LOADED");
+    } else {
+        updateScriptStatus("READY");
+    }
+
     javaServant.loadScript(selectedScript);
 }
 
@@ -22,6 +28,15 @@ function populateScriptList() {
         selectDropDown[selectDropDown.length] = new Option(scriptList[i], scriptList[i]);
     }
     alert('populateScriptList done!');
+}
+
+function populateVariableList() {
+    alert('populateVarList');
+    alert(variableMapList);
+
+    var controllerScope = getAngularControllerScope();
+    controllerScope.updateScriptVars(JSON.parse(variableMapList));
+    alert('populateVarList done!');
 }
 
 function stopScript() {

@@ -8,8 +8,8 @@ app.controller('JServantCtrl', function($scope) { //TODO: try using $window for 
     $scope.currentScriptName = "(None)";
     $scope.vars = [/*
         {
-            name : "server",
-            value: "starfish3"
+            "name" : "server",
+            "value": "starfish3"
         },
         {
             name : "server2",
@@ -22,8 +22,8 @@ app.controller('JServantCtrl', function($scope) { //TODO: try using $window for 
         {
             name : "serve99",
             value: "starfish4wrwe"
-        }
-    */];
+        }*/
+    ];
 
     $scope.runningState = function() {
         var currState = $scope.currentScriptStatus;
@@ -45,6 +45,12 @@ app.controller('JServantCtrl', function($scope) { //TODO: try using $window for 
     $scope.updateScriptStatus = function(newStatus) {
         $scope.$apply(function() {
             $scope.currentScriptStatus = newStatus;
+        });
+    };
+
+    $scope.updateScriptVars = function(newScriptVars) {
+        $scope.$apply(function() {
+            $scope.vars = newScriptVars;
         });
     };
 

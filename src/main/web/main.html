@@ -32,6 +32,33 @@
                 </div>
                 <div class="form-body">
                     <h1 class="form-title text-center">JServant</h1>
+                    <div id="varsHolder" name="variableContainerDiv">
+                        <li ng-repeat="variable in vars">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-10">
+                                                <label for="var_{{variable.name}}">
+                                                    {{variable.name}}:
+                                                </label>
+                                                <div class="divider"></div>
+                                                <input class="input-large" type="text" id="var_{{variable.name}}"
+                                                       name="var_{{variable.name}}" ng-model="variable.value"
+                                                       style="text-align:center;">
+                                                </input>
+                                                <div class="divider"></div>
+                                                <button class="btn btn-success btn-xs">
+                                                    <span class="glyphicon glyphicon-ok"/>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dividerVertical"></div>
+                        </li>
+                    </div>
                     <div class="form-group">
                         <label for="scriptSelect">Select a script: </label>
                         <div class="divider"></div>
@@ -47,34 +74,9 @@
                             <span class="glyphicon glyphicon-plus"/>
                         </button>-->
                     </div>
-                    <div id="varsHolder">
-                        <li ng-repeat="variable in vars">
-                            <div class="container">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="row">
-                                            <div class="col-md-10">
-                                                <label for="var_{{variable.name}}">
-                                                    {{variable.value}}
-                                                </label>
-                                                <div class="divider"></div>
-                                                <input class="input-large" type="text" id="var_{{variable.name}}"
-                                                       name="var_{{variable.name}}" ng-model="variable.value">
-                                                </input>
-                                                <div class="divider"></div>
-                                                <button class="btn btn-success btn-xs">
-                                                    <span class="glyphicon glyphicon-ok"/>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="dividerVertical"></div>-
-                        </li>
-                    </div>
                     <div class="form-group">
-                        <select class="form-control" id="scriptSelect" onchange="loadScript();" ng-model="currentScriptName">
+                        <select class="form-control" id="scriptSelect" onchange="loadScript();"
+                                ng-model="currentScriptName">
                             <option>(None)</option>
                         </select>
                     </div>

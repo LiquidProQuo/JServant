@@ -16,15 +16,6 @@ import java.util.logging.Logger;
  */
 public class JSThread extends Thread {
     private final static Logger LOG = Logger.getLogger(JSThread.class.getName());
-    /*
-    public static final String NOT_RUNNING = "Not Running";
-    public static final String RUNNING = "Running";
-    public static final String SUCCEEDED = "Succeeded";
-    public static final String FAILED = "Failed";
-    public static final String STOPPED = "Stopped";
-    public static final String READY = "Ready";
-    */
-
 
     private File script;
     private SuperRobot bot;

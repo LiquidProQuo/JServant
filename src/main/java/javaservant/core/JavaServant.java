@@ -13,11 +13,13 @@ import javaservant.view.JServantWebFrame;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.io.File;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.*;
 
 /**
@@ -36,13 +38,14 @@ public class JavaServant extends Application {
 	public static final String FRAME_TITLE = "Java Servant " + APP_VERSION;
 	private final static Logger LOG = Logger.getLogger(JavaServant.class.getName());
 
-	enum SCRIPT_STATE {
+	public enum SCRIPT_STATE {
 		NONE,
 		READY,
 		RUNNING,
 		SUCCEEDED,
 		FAILED,
-		STOPPED
+		STOPPED,
+		ERROR_LOADING
 	}
 
     private SuperRobot bot;
@@ -196,6 +199,26 @@ public class JavaServant extends Application {
     	return str;
     }
 
+	//TODO: scaffolding
+	public File loadDropDownScriptGetFile(String currText, String fileName) {
+		String  str = currText;
+		if(fileName != null) {
+			if(NONE.equals(fileName)) {
+				script = null;
+				JavaServant.setScriptState(SCRIPT_STATE.NONE);
+			} else {
+				File file = new File(DEFAULT_FILE_DIRECTORY + "/" + fileName);
+				if (!file.exists()) {
+					LOG.warning("File at " +  DEFAULT_FILE_DIRECTORY + "/" + fileName + " does not exist! Exiting.");
+					return null;
+				}
+				script = file;
+				JavaServant.setScriptState(SCRIPT_STATE.READY);
+			}
+		}
+		return script;
+	}
+
     public boolean runScript() {
         if(script != null && (thread == null || !thread.running)) {
         	LOG.info("New Thread request to start running via start button.");
@@ -245,5 +268,27 @@ public class JavaServant extends Application {
 			return "NO SCRIPT LOADED";
 		}
 		return scriptState.name();
+	}
+
+	public Map<String, String> preprocessScript() throws IOException {
+		if (script == null) {
+			throw new IllegalArgumentException("Script cannot be null!");
+		}
+
+		Map<String, String> varMap = new HashMap<>();
+		BufferedReader br = new BufferedReader(new FileReader(script));
+		String line;
+		while((line = br.readLine()) != null) {
+			if (line.toLowerCase().startsWith("var")){
+				int firstColon = line.indexOf(':');
+				line = line.substring(firstColon+1).trim();
+				int firstEqual = line.indexOf('=');
+				String key = line.substring(0, firstEqual).trim();
+				String val = line.substring(firstEqual+1);
+				varMap.put(key, val);
+			}
+		}
+
+		return varMap;
 	}
 }
