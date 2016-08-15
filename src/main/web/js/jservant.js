@@ -1,45 +1,42 @@
 var app = angular.module('JServant', []);
-app.controller('JServantCtrl', function($scope) { //TODO: try using $window for DOM vars
-
+app.controller('JServantCtrl', ['$scope', '$window', function($scope, $window) {
+    // ------ CONSTANTS -----
     //TODO: get this list from backend
-    $scope.RUN_STATES = ["NO SCRIPT LOADED", "RUNNING", "SUCCEEDED", "FAILED", "STOPPED", "READY"];
+    var RUN_STATES = ["NO SCRIPT LOADED", "RUNNING", "SUCCEEDED", "FAILED", "STOPPED", "READY"];
+    var NO_SCRIPT =  RUN_STATES[0];
+    var RUNNING =    RUN_STATES[1];;
+    var SUCCEEDED =  RUN_STATES[2];
+    var FAILED =     RUN_STATES[3];
+    var STOPPED =    RUN_STATES[4];
+    var READY =      RUN_STATES[5];
 
-    $scope.currentScriptStatus = $scope.RUN_STATES[0];
-    $scope.currentScriptName = "(None)";
-    $scope.vars = [/*
-        {
-            "name" : "server",
-            "value": "starfish3"
-        },
-        {
-            name : "server2",
-            value: "starfish4"
-        },
-        {
-            name : "server899",
-            value: "starfish4rewyry"
-        },
-        {
-            name : "serve99",
-            value: "starfish4wrwe"
-        }*/
-    ];
+    var STATE_NOT_RUNNING = "notRunning";
+    var STATE_RUNNING = "running";
+    var STATE_ERROR_RUNNING = "errorRunning";
+    var STATE_SUCCESS_RUNNING = "successRunning";
+
+    $scope.NONE_SELECTED_TEXT = "(None)";
+    // ----------------------
+
+    $scope.currentScriptStatus = NO_SCRIPT;
+    $scope.currentScriptName = $scope.NONE_SELECTED_TEXT;
+    $scope.vars = [];
 
     $scope.runningState = function() {
         var currState = $scope.currentScriptStatus;
-        if (currState == $scope.RUN_STATES[0] || currState == $scope.RUN_STATES[5]) {
-            return "notRunning";
+        if (currState == NO_SCRIPT || currState == READY) {
+            return STATE_NOT_RUNNING;
         }
-        if (currState == $scope.RUN_STATES[1]) {
-            return "running";
+        if (currState == RUNNING) {
+            return STATE_RUNNING;
         }
-        if (currState == $scope.RUN_STATES[3] || currState == $scope.RUN_STATES[4]) {
-            return "errorRunning";
+        if (currState == FAILED || currState == STOPPED) {
+            return STATE_ERROR_RUNNING;
         }
-        if (currState == $scope.RUN_STATES[2]) {
-            return "successRunning";
+        if (currState == SUCCEEDED) {
+            return STATE_SUCCESS_RUNNING;
         }
-        return $scope.RUN_STATES[0];
+        return NO_SCRIPT;
     };
 
     $scope.updateScriptStatus = function(newStatus) {
@@ -54,4 +51,30 @@ app.controller('JServantCtrl', function($scope) { //TODO: try using $window for 
         });
     };
 
-});
+    $scope.runScript = function() {
+        /* preset script display to prevent any lag waiting for server response
+           server will correct us if we're somehow wrong
+        */
+        if ($scope.currentScriptStatus != NO_SCRIPT) {
+            $scope.currentScriptStatus = RUNNING;
+        }
+
+        $scope.vars.forEach(function(item, index) {
+            alert(item.name + ":" + item.value);
+            $window.javaServant.updateVariableMap(item.name, item.value);
+        });
+
+        $window.javaServant.runScript();
+    };
+
+    $scope.stopScript = function() {
+        /* preset script display to prevent any lag waiting for server response
+           server will correct us if we're somehow wrong
+        */
+        if ($scope.currentScriptStatus == RUNNING) {
+            $scope.currentScriptStatus = STOPPED;
+        }
+        $window.javaServant.stopScript();
+    };
+
+}]);

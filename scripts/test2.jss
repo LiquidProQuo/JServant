@@ -1,0 +1,1 @@
+#comment ignore this#placing a  '#' at the *beginning* of the line tells jservant to skip this linevar:tricky==15==var:alsoTricky=$lalala::==::foobar$run:notepad.exewait:3000enter:I can say $(tricky). I can also say $(alsoTricky)enter:Colons used after the initial will not confuse script, e.g: $(tricky):$(alsoTricky)! type:var2 retains it's original value: $(alsoTricky)

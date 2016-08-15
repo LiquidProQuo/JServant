@@ -8,7 +8,8 @@ var selectedScript = "(None)";
 function loadScript() {
     selectedScript =  document.getElementById('scriptSelect').value;
 
-    //preset script display to prevent any lag waiting for server response
+    // TODO: constants plz
+    // preset script display to prevent any lag waiting for server response
     if (selectedScript == "(None)") {
         updateScriptStatus("NO SCRIPT LOADED");
     } else {
@@ -22,7 +23,7 @@ function populateScriptList() {
     alert('populateScriptList');
     selectDropDown =  document.getElementById('scriptSelect');
 
-    var scriptList = scriptListArray;//["test.txt", "test2.txt"];
+    var scriptList = scriptListArray;
     for (var i = 1; i < scriptList.length; i++) {
         // Start at index 1 as "(None)" option already preloaded
         selectDropDown[selectDropDown.length] = new Option(scriptList[i], scriptList[i]);
@@ -37,28 +38,6 @@ function populateVariableList() {
     var controllerScope = getAngularControllerScope();
     controllerScope.updateScriptVars(JSON.parse(variableMapList));
     alert('populateVarList done!');
-}
-
-function stopScript() {
-    /* preset script display to prevent any lag waiting for server response
-       server will correct us if we're somehow wrong
-    */
-    var controllerScope = getAngularControllerScope();
-    if (controllerScope.currentScriptStatus == "RUNNING") {
-        updateScriptStatus("STOPPED");
-    }
-    javaServant.stopScript();
-}
-
-function runScript() {
-    /* preset script display to prevent any lag waiting for server response
-       server will correct us if we're somehow wrong
-    */
-    var controllerScope = getAngularControllerScope();
-    if (controllerScope.currentScriptStatus != "NO SCRIPT LOADED") {
-        updateScriptStatus("RUNNING");
-    }
-    javaServant.runScript();
 }
 
 function updateScriptStatus(newStatus) {

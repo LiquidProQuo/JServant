@@ -1,0 +1,1 @@
+run:notepad.exewait:3000type:This is a sentence I typed using tricky characters:;'095t7[]{}%$#@!*press:entertype:This is another one-++13765657hgkh38yrt++><!#$%&;;''"press:enterwait:1000enter:All done! Let's close and exit.wait:1000closeappwait:100chooseoption:2

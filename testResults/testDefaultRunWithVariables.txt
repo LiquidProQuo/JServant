@@ -1,0 +1,3 @@
+I can say =15==. I can also say $lalala::==::foobar$
+Colons used after the initial will not confuse script, e.g: =15==:$lalala::==::foobar$! 
+var2 retains it's original value: $lalala::==::foobar$

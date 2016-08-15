@@ -13,11 +13,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
-public class SuperRobot extends Robot implements NativeKeyListener
-{
+public class SuperRobot extends Robot implements NativeKeyListener {
 
-    public static final int MAX_ALLOWED_WAIT_TIME = 60000;
-    public final String COMMENT_SYMBOL = "#";
+    private static final int MAX_ALLOWED_WAIT_TIME = 60000;
+    private final String COMMENT_SYMBOL = "#";
     
 	private HashMap<String,Integer> dict;
 	private static volatile boolean enterPressed; //volatile as this is updated in separate thread to escape empty while loop
@@ -28,7 +27,7 @@ public class SuperRobot extends Robot implements NativeKeyListener
 	}
 	
 	private void fillDict() {
-		dict = new HashMap<String,Integer>();
+		dict = new HashMap<>();
 		
 		//returns commands for key presses (letters are all returned lower case)
 		dict.put("a", KeyEvent.VK_A);
@@ -179,542 +178,462 @@ public class SuperRobot extends Robot implements NativeKeyListener
 		dict.put("BACKSPACE", KeyEvent.VK_BACK_SPACE);
 	}
 	
-	public void commandTranslate(String cmd) {
-		if (cmd.equals("copy"))
-		{
+	private void commandTranslate(String cmd) throws NativeHookException {
+		if (cmd.equals("copy")) {
 			copy();
 			return;
 		}
-		if (cmd.equals("paste"))
-		{
+		if (cmd.equals("paste")) {
 			paste();
 			return;
 		}
 		
-		if (cmd.equals("leftclick"))
-		{
+		if (cmd.equals("leftclick")) {
 			leftClick();
 			return;
 		}
 		
-		if (cmd.equals("rightclick"))
-		{
+		if (cmd.equals("rightclick")) {
 			rightClick();
 			return;
 		}
 		
-		if (cmd.equals("undo"))
-		{
+		if (cmd.equals("undo")) {
 			undo();
 			return;
 		}
 		
-		if (cmd.equals("redo"))
-		{
+		if (cmd.equals("redo")) {
 			redo();
 			return;
 		}
-        if (cmd.equals("newtab"))
-		{
+        if (cmd.equals("newtab")) {
 			newTab();
 			return;
 		}
-        if (cmd.equals("closetab"))
-		{
+        if (cmd.equals("closetab")) {
 			closeTab();
 			return;
 		}
-		if (cmd.equals("selectaddressbar"))
-		{
+		if (cmd.equals("selectaddressbar")) {
 			selectAddressBar();
 			return;
 		}
-        if (cmd.equals("dblclick"))
-		{
+        if (cmd.equals("doubleclick")) {
 			doubleClick();
 			return;
 		}
-        if (cmd.equals("closeapp"))
-		{
+        if (cmd.equals("closeapp")) {
 			closeApp();
-			return;
 		} else if ("waitforenter".equals(cmd) || "w4e".equals(cmd)) {
         	waitForEnter();
-        }
+        } else if ("copyall".equals(cmd)) {
+			copyAll();
+		} else if ("selectall".equals(cmd)) {
+			selectAll();
+		} else if ("save".equals(cmd)) {
+			save();
+		}
 	}
 
-        /*
-         * Apparently Robot's key press method is literal and will only be able
-         * to press keys that exist on the keyboard, so characters like "!"
-         * will cause an invalid argument exception (assuming your keyboard
-         doesn't actually have a "!" key).
-         *
-         * This method is a work around, catching these keys before they're
-         * attempted to be pressed, and overriding it with the keyboard commands
-         * for the specific key. E.g: "!" = "Shift+1".
-         */
-        public boolean checkShiftChar(int val)
-        {
-            switch(val)
-            {
-                case KeyEvent.VK_EXCLAMATION_MARK: this.hitSimultaneousKeysPlusDelimited("shift+1");
-                                                    return true;
-                case KeyEvent.VK_AT: this.hitSimultaneousKeysPlusDelimited("shift+2");
-                                                    return true;
-                case KeyEvent.VK_NUMBER_SIGN: this.hitSimultaneousKeysPlusDelimited("shift+3");
-                                                    return true;
-                case KeyEvent.VK_DOLLAR: this.hitSimultaneousKeysPlusDelimited("shift+4");
-                                                    return true;
-                case KeyEvent.VK_UNDO: this.hitSimultaneousKeysPlusDelimited("shift+5");
-                                                    return true;
-                case KeyEvent.VK_DEAD_CARON: this.hitSimultaneousKeysPlusDelimited("shift+6");
-                                                    return true;
-                case KeyEvent.VK_AMPERSAND: this.hitSimultaneousKeysPlusDelimited("shift+7");
-                                                    return true;
-                case KeyEvent.VK_ASTERISK: this.hitSimultaneousKeysPlusDelimited("shift+8");
-                                                    return true;
-                case KeyEvent.VK_UNDERSCORE: this.hitSimultaneousKeysPlusDelimited("shift+-");
-                                                    return true;
-                case KeyEvent.VK_BRACELEFT: this.hitSimultaneousKeysPlusDelimited("shift+[");
-                                                    return true;
-                case KeyEvent.VK_BRACERIGHT: this.hitSimultaneousKeysPlusDelimited("shift+]");
-                                                    return true;
-                case KeyEvent.VK_DEAD_TILDE: this.hitSimultaneousKeysPlusDelimited("shift+`");
-                                                    return true;
-                case KeyEvent.VK_DEAD_GRAVE: this.hitSimultaneousKeysPlusDelimited("shift+/");
-                                                    return true;
-                case KeyEvent.VK_LESS: this.hitSimultaneousKeysPlusDelimited("shift+,");
-                                                    return true;
-                case KeyEvent.VK_GREATER: this.hitSimultaneousKeysPlusDelimited("shift+.");
-                                                    return true;
-                case KeyEvent.VK_SEPARATOR: this.hitSimultaneousKeysPlusDelimited("shift+\\");
-                                                    return true;
-                case KeyEvent.VK_LEFT_PARENTHESIS: this.hitSimultaneousKeysPlusDelimited("shift+9");
-                                                    return true;
-                case KeyEvent.VK_RIGHT_PARENTHESIS: this.hitSimultaneousKeysPlusDelimited("shift+0");
-                                                    return true;
-                case KeyEvent.VK_COLON: this.hitSimultaneousKeysPlusDelimited("shift+;");
-                                                    return true;
-                case KeyEvent.VK_QUOTEDBL: this.hitSimultaneousKeysPlusDelimited("shift+'");
-                                                    return true;
-                case KeyEvent.VK_AGAIN: this.hitSimultaneousKeysPlusDelimited("shift+a");
-                                                    return true;
-                case KeyEvent.VK_BEGIN: this.hitSimultaneousKeysPlusDelimited("shift+b");
-                                                    return true;
-                case KeyEvent.VK_CONVERT: this.hitSimultaneousKeysPlusDelimited("shift+c");
-                                                    return true;
-                case KeyEvent.VK_DEAD_VOICED_SOUND: this.hitSimultaneousKeysPlusDelimited("shift+d");
-                                                    return true;
-                case KeyEvent.VK_EURO_SIGN: this.hitSimultaneousKeysPlusDelimited("shift+e");
-                                                    return true;
-                case KeyEvent.VK_F24: this.hitSimultaneousKeysPlusDelimited("shift+f");
-                                                    return true;
-                case KeyEvent.VK_DEAD_OGONEK: this.hitSimultaneousKeysPlusDelimited("shift+g");
-                                                    return true;
-                case KeyEvent.VK_HALF_WIDTH: this.hitSimultaneousKeysPlusDelimited("shift+h");
-                                                    return true;
-                case KeyEvent.VK_INVERTED_EXCLAMATION_MARK: this.hitSimultaneousKeysPlusDelimited("shift+i");
-                                                    return true;
-                case KeyEvent.VK_JAPANESE_KATAKANA: this.hitSimultaneousKeysPlusDelimited("shift+j");
-                                                    return true;
-                case KeyEvent.VK_KATAKANA: this.hitSimultaneousKeysPlusDelimited("shift+k");
-                                                    return true;
-                case KeyEvent.VK_DEAD_ABOVEDOT: this.hitSimultaneousKeysPlusDelimited("shift+l");
-                                                    return true;
-                case KeyEvent.VK_MODECHANGE: this.hitSimultaneousKeysPlusDelimited("shift+m");
-                                                    return true;
-                case KeyEvent.VK_NONCONVERT: this.hitSimultaneousKeysPlusDelimited("shift+n");
-                                                    return true;
-                case KeyEvent.VK_DEAD_ABOVERING: this.hitSimultaneousKeysPlusDelimited("shift+o");
-                                                    return true;
-                case KeyEvent.VK_PREVIOUS_CANDIDATE: this.hitSimultaneousKeysPlusDelimited("shift+p");
-                                                    return true;
-                case KeyEvent.VK_DEAD_DOUBLEACUTE: this.hitSimultaneousKeysPlusDelimited("shift+q");
-                                                    return true;
-                case KeyEvent.VK_ROMAN_CHARACTERS: this.hitSimultaneousKeysPlusDelimited("shift+r");
-                                                    return true;
-                case KeyEvent.VK_SUBTRACT: this.hitSimultaneousKeysPlusDelimited("shift+s");
-                                                    return true;
-                case KeyEvent.VK_DEAD_DIAERESIS: this.hitSimultaneousKeysPlusDelimited("shift+t");
-                                                    return true;
-                case KeyEvent.VK_DEAD_CEDILLA: this.hitSimultaneousKeysPlusDelimited("shift+u");
-                                                    return true;
-                case KeyEvent.VK_DEAD_BREVE: this.hitSimultaneousKeysPlusDelimited("shift+v");
-                                                    return true;
-                case KeyEvent.VK_PROPS: this.hitSimultaneousKeysPlusDelimited("shift+w");
-                                                    return true;
-                case KeyEvent.VK_ALT_GRAPH: this.hitSimultaneousKeysPlusDelimited("shift+x");
-                                                    return true;
-                case KeyEvent.VK_JAPANESE_HIRAGANA: this.hitSimultaneousKeysPlusDelimited("shift+y");
-                                                    return true;
-                case KeyEvent.VK_HIRAGANA: this.hitSimultaneousKeysPlusDelimited("shift+z");
-                                                    return true;
-                case KeyEvent.VK_PLUS: int[] temp = {KeyEvent.VK_SHIFT,KeyEvent.VK_EQUALS};
-                                        this.hitSimultaneousKeys(temp);return true;
-            }
 
-            return false;
-        }
-	
-	//for when conversion is needed
-	public void typeArray(Object [] cmds)
-	{
-		for (int i = 0; i < cmds.length;i++)
-		{
-			try
-			{
-				this.keyPress((Integer)cmds[i]);
-				this.keyRelease((Integer)cmds[i]);
-			}
-			catch(Exception e)
-			{
-				System.out.println(i);
-			}
+	/*
+	 * Apparently Robot's key press method is literal and will only be able
+     * to press keys that exist on the keyboard, so characters like "!"
+     * will cause an invalid argument exception (assuming your keyboard
+     doesn't actually have a "!" key).
+     *
+     * This method is a work around, catching these keys before they're
+     * attempted to be pressed, and overriding it with the keyboard commands
+     * for the specific key. E.g: "!" = "Shift+1".
+     */
+	private boolean checkShiftChar(int val) {
+		switch (val) {
+			case KeyEvent.VK_EXCLAMATION_MARK:
+				this.hitSimultaneousKeysPlusDelimited("shift+1");
+				return true;
+			case KeyEvent.VK_AT:
+				this.hitSimultaneousKeysPlusDelimited("shift+2");
+				return true;
+			case KeyEvent.VK_NUMBER_SIGN:
+				this.hitSimultaneousKeysPlusDelimited("shift+3");
+				return true;
+			case KeyEvent.VK_DOLLAR:
+				this.hitSimultaneousKeysPlusDelimited("shift+4");
+				return true;
+			case KeyEvent.VK_UNDO:
+				this.hitSimultaneousKeysPlusDelimited("shift+5");
+				return true;
+			case KeyEvent.VK_DEAD_CARON:
+				this.hitSimultaneousKeysPlusDelimited("shift+6");
+				return true;
+			case KeyEvent.VK_AMPERSAND:
+				this.hitSimultaneousKeysPlusDelimited("shift+7");
+				return true;
+			case KeyEvent.VK_ASTERISK:
+				this.hitSimultaneousKeysPlusDelimited("shift+8");
+				return true;
+			case KeyEvent.VK_UNDERSCORE:
+				this.hitSimultaneousKeysPlusDelimited("shift+-");
+				return true;
+			case KeyEvent.VK_BRACELEFT:
+				this.hitSimultaneousKeysPlusDelimited("shift+[");
+				return true;
+			case KeyEvent.VK_BRACERIGHT:
+				this.hitSimultaneousKeysPlusDelimited("shift+]");
+				return true;
+			case KeyEvent.VK_DEAD_TILDE:
+				this.hitSimultaneousKeysPlusDelimited("shift+`");
+				return true;
+			case KeyEvent.VK_DEAD_GRAVE:
+				this.hitSimultaneousKeysPlusDelimited("shift+/");
+				return true;
+			case KeyEvent.VK_LESS:
+				this.hitSimultaneousKeysPlusDelimited("shift+,");
+				return true;
+			case KeyEvent.VK_GREATER:
+				this.hitSimultaneousKeysPlusDelimited("shift+.");
+				return true;
+			case KeyEvent.VK_SEPARATOR:
+				this.hitSimultaneousKeysPlusDelimited("shift+\\");
+				return true;
+			case KeyEvent.VK_LEFT_PARENTHESIS:
+				this.hitSimultaneousKeysPlusDelimited("shift+9");
+				return true;
+			case KeyEvent.VK_RIGHT_PARENTHESIS:
+				this.hitSimultaneousKeysPlusDelimited("shift+0");
+				return true;
+			case KeyEvent.VK_COLON:
+				this.hitSimultaneousKeysPlusDelimited("shift+;");
+				return true;
+			case KeyEvent.VK_QUOTEDBL:
+				this.hitSimultaneousKeysPlusDelimited("shift+'");
+				return true;
+			case KeyEvent.VK_AGAIN:
+				this.hitSimultaneousKeysPlusDelimited("shift+a");
+				return true;
+			case KeyEvent.VK_BEGIN:
+				this.hitSimultaneousKeysPlusDelimited("shift+b");
+				return true;
+			case KeyEvent.VK_CONVERT:
+				this.hitSimultaneousKeysPlusDelimited("shift+c");
+				return true;
+			case KeyEvent.VK_DEAD_VOICED_SOUND:
+				this.hitSimultaneousKeysPlusDelimited("shift+d");
+				return true;
+			case KeyEvent.VK_EURO_SIGN:
+				this.hitSimultaneousKeysPlusDelimited("shift+e");
+				return true;
+			case KeyEvent.VK_F24:
+				this.hitSimultaneousKeysPlusDelimited("shift+f");
+				return true;
+			case KeyEvent.VK_DEAD_OGONEK:
+				this.hitSimultaneousKeysPlusDelimited("shift+g");
+				return true;
+			case KeyEvent.VK_HALF_WIDTH:
+				this.hitSimultaneousKeysPlusDelimited("shift+h");
+				return true;
+			case KeyEvent.VK_INVERTED_EXCLAMATION_MARK:
+				this.hitSimultaneousKeysPlusDelimited("shift+i");
+				return true;
+			case KeyEvent.VK_JAPANESE_KATAKANA:
+				this.hitSimultaneousKeysPlusDelimited("shift+j");
+				return true;
+			case KeyEvent.VK_KATAKANA:
+				this.hitSimultaneousKeysPlusDelimited("shift+k");
+				return true;
+			case KeyEvent.VK_DEAD_ABOVEDOT:
+				this.hitSimultaneousKeysPlusDelimited("shift+l");
+				return true;
+			case KeyEvent.VK_MODECHANGE:
+				this.hitSimultaneousKeysPlusDelimited("shift+m");
+				return true;
+			case KeyEvent.VK_NONCONVERT:
+				this.hitSimultaneousKeysPlusDelimited("shift+n");
+				return true;
+			case KeyEvent.VK_DEAD_ABOVERING:
+				this.hitSimultaneousKeysPlusDelimited("shift+o");
+				return true;
+			case KeyEvent.VK_PREVIOUS_CANDIDATE:
+				this.hitSimultaneousKeysPlusDelimited("shift+p");
+				return true;
+			case KeyEvent.VK_DEAD_DOUBLEACUTE:
+				this.hitSimultaneousKeysPlusDelimited("shift+q");
+				return true;
+			case KeyEvent.VK_ROMAN_CHARACTERS:
+				this.hitSimultaneousKeysPlusDelimited("shift+r");
+				return true;
+			case KeyEvent.VK_SUBTRACT:
+				this.hitSimultaneousKeysPlusDelimited("shift+s");
+				return true;
+			case KeyEvent.VK_DEAD_DIAERESIS:
+				this.hitSimultaneousKeysPlusDelimited("shift+t");
+				return true;
+			case KeyEvent.VK_DEAD_CEDILLA:
+				this.hitSimultaneousKeysPlusDelimited("shift+u");
+				return true;
+			case KeyEvent.VK_DEAD_BREVE:
+				this.hitSimultaneousKeysPlusDelimited("shift+v");
+				return true;
+			case KeyEvent.VK_PROPS:
+				this.hitSimultaneousKeysPlusDelimited("shift+w");
+				return true;
+			case KeyEvent.VK_ALT_GRAPH:
+				this.hitSimultaneousKeysPlusDelimited("shift+x");
+				return true;
+			case KeyEvent.VK_JAPANESE_HIRAGANA:
+				this.hitSimultaneousKeysPlusDelimited("shift+y");
+				return true;
+			case KeyEvent.VK_HIRAGANA:
+				this.hitSimultaneousKeysPlusDelimited("shift+z");
+				return true;
+			case KeyEvent.VK_PLUS:
+				int[] temp = {KeyEvent.VK_SHIFT, KeyEvent.VK_EQUALS};
+				this.hitSimultaneousKeys(temp);
+				return true;
 		}
+
+		return false;
 	}
 	
 	//normal case
-	public void typeArray(int [] cmds)
-	{
-		for (int i = 0; i < cmds.length;i++)
-		{
-			try
-			{
-				//first let's check to see if this char is one that
-				//requires holding shift
-				if(!checkShiftChar(cmds[i]))
-				{
-					this.keyPress(cmds[i]);
-					this.keyRelease(cmds[i]);
-				}
-			}
-			catch(Exception e)
-			{
-				System.out.println(i);
+	private void typeArray(int[] cmds) {
+		for (int cmd : cmds) {
+			//first let's check to see if this char is one that
+			//requires holding shift
+			if (!checkShiftChar(cmd)) {
+				this.keyPress(cmd);
+				this.keyRelease(cmd);
 			}
 		}
 	}
 	
-	public void typeCommaDelimitedString(String str)
-	{
-		ArrayList<Integer> temp = new ArrayList<Integer>();
-		StringTokenizer st = new StringTokenizer(str,",");
-		String s = st.nextToken();
-		while (s != null)
-		{
-			temp.add(dict.get(s));
-		}
-		
-		//int [] toDo = new int [temp.size()]; 
-		typeArray(temp.toArray());
-	}
-	
-	public void typeLiteralString(String str) {
+	private void typeLiteralString(String str) {
 		int [] toDo = new int[str.length()];
 		
 		for (int i = 0; i < str.length(); i++) {
 			toDo[i] = dict.get(str.charAt(i)+""); // crashes if value is left as pure char
 		}
-		
 		typeArray(toDo);
 	}
 	
-	public void enterLiteralString(String str) {
+	private void enterLiteralString(String str) {
 		typeLiteralString(str);
     	wait("50");
     	press("enter");
     	wait("100");
 	}
 	
-	public void hitSimultaneousKeys(int [] cmds)
-	{
-		for (int i = 0; i < cmds.length;i++)
-		{
-			this.keyPress(cmds[i]);		
-		}
-		
-		delay(100);
-		//release afterwards
-		for(int i = 0; i < cmds.length;i++)
-		{
-			this.keyRelease(cmds[i]);		
-		}
-	}
-	
-	public void hitSimultaneousKeys(Object [] cmds)
-	{
-		for (int i = 0; i < cmds.length;i++)
-		{
-			this.keyPress((Integer)cmds[i]);		
+	private void hitSimultaneousKeys(int[] cmds) {
+		for (int cmd1 : cmds) {
+			this.keyPress(cmd1);
 		}
 		delay(100);
 		//release afterwards
-		for(int i = 0; i < cmds.length;i++)
-		{
-			this.keyRelease((Integer)cmds[i]);		
+		for (int cmd : cmds) {
+			this.keyRelease(cmd);
 		}
 	}
 	
-	public void hitSimultaneousKeysPlusDelimited(String cmds)
-	{
-		ArrayList<Integer> toDo = new ArrayList<Integer>();
-		
+	private void hitSimultaneousKeys(Object[] cmds) {
+		for (Object cmd1 : cmds) {
+			this.keyPress((Integer) cmd1);
+		}
+		delay(100);
+		//release afterwards
+		for (Object cmd : cmds) {
+			this.keyRelease((Integer) cmd);
+		}
+	}
+	
+	private void hitSimultaneousKeysPlusDelimited(String cmds) {
+		ArrayList<Integer> toDo = new ArrayList<>();
 		StringTokenizer st = new StringTokenizer(cmds,"+");
-		//String str = st.nextToken();
-		while (st.hasMoreTokens())
-		{
+		while (st.hasMoreTokens()) {
 			toDo.add(dict.get(st.nextToken()));
-			//str = st.nextToken();
 		}
 		
 		hitSimultaneousKeys(toDo.toArray());
 	}
 	
-	public void sequenceCommand(String cmd)
-	{
-		StringTokenizer st = new StringTokenizer(cmd,",");
-		while (st.hasMoreTokens())
-		{
-			command(st.nextToken());
-		}
-	}
-	
-	public void sequenceCommand(String cmd, int numTimes)
-	{
-		for (int i = 0; i < numTimes; i++)
-		{
-			StringTokenizer st = new StringTokenizer(cmd,",");
-			while(st.hasMoreTokens())
-			{
-				command(st.nextToken());
-			}
-		}
-	}
-	
-	public void command(String cmd)
-	{
+	private void command(String cmd) throws NativeHookException {
 		commandTranslate(cmd.toLowerCase());
 	}
 	
-	public void command(String cmd, int numTimes)
-	{
-		for (int i = 0; i < numTimes; i++)
+	private void command(String cmd, int numTimes) throws NativeHookException {
+		for (int i = 0; i < numTimes; i++) {
 			commandTranslate(cmd.toLowerCase());
+		}
 	}
 
-    public void hold(String str)
+    private void hold(String str)
     {
     	this.keyPress(dict.get(str));
     }
 
-    public void release(String str)
+    private void release(String str)
     {
     	this.keyRelease(dict.get(str));
     }
 	
-	public void press(String str)
-	{
+	private void press(String str) {
 		this.keyPress(dict.get(str));
 		this.keyRelease(dict.get(str));
 	}
 	
-	public void press(String str, int numTimes)
-	{
-		for (int i = 0; i < numTimes; i++)
-		{
+	private void press(String str, int numTimes) {
+		for (int i = 0; i < numTimes; i++) {
 			this.keyPress(dict.get(str));
 			this.keyRelease(dict.get(str));
 		}
 	}
 	
-	public void leftClick()
-	{
+	private void leftClick() {
 		mousePress(InputEvent.BUTTON1_MASK);
 		mouseRelease(InputEvent.BUTTON1_MASK);
 	}
 
-    public void doubleClick()
-	{
+    private void doubleClick() {
 		leftClick();
         this.delay(150);
         leftClick();
 	}
 	
-	public void leftClick(int numTimes)
-	{
-		for (int i = 0; i < numTimes; i++)
-		{
-			mousePress(InputEvent.BUTTON1_MASK);
-			mouseRelease(InputEvent.BUTTON1_MASK);
-		}
-	}
-	
-	public void rightClick()
-	{
+	private void rightClick() {
 		mousePress(InputEvent.BUTTON3_MASK);
 		mouseRelease(InputEvent.BUTTON3_MASK);
 	}
-	
-	public void copy()
-	{
-		hitSimultaneousKeysPlusDelimited("ctrl+c");
+
+	private void selectAll() {
+		hitSimultaneousKeysPlusDelimited("ctrl+a");
 	}
 	
-	public void paste()
+	private void copy() {
+		hitSimultaneousKeysPlusDelimited("ctrl+c");
+	}
+
+	private void copyAll() {
+		selectAll();
+		copy();
+	}
+
+	private void save() {
+		hitSimultaneousKeysPlusDelimited("ctrl+s");
+	}
+	private void paste()
 	{
 		hitSimultaneousKeysPlusDelimited("ctrl+v");
 	}
 	
-	public void paste(int numTimes)
-	{
-		for(int i = 0; i < numTimes; i++)
-			hitSimultaneousKeysPlusDelimited("ctrl+v");
-	}
-	
-	public void newTab()
+	private void newTab()
 	{
 		hitSimultaneousKeysPlusDelimited("ctrl+t");
 	}
 	
-	public void closeTab()
+	private void closeTab()
 	{
 		hitSimultaneousKeysPlusDelimited("ctrl+w");
 	}
 
-        public void closeApp()
-	{
+	private void closeApp() {
 		hitSimultaneousKeysPlusDelimited("alt+f4");
 	}
 	
-	public void undo()
+	private void undo()
 	{
 		hitSimultaneousKeysPlusDelimited("ctrl+z");
 	}
 	
-	public void redo()
+	private void redo()
 	{
 		hitSimultaneousKeysPlusDelimited("ctrl+y");
 	}
 	
-	public void selectAddressBar()
+	private void selectAddressBar()
 	{
 		hitSimultaneousKeysPlusDelimited("alt+d");
 	}
 	
-	public void wait(String val) {
+	private void wait(String val) {
 		int amount = Integer.parseInt(val);
-        while (amount > MAX_ALLOWED_WAIT_TIME)
-        {
+        while (amount > MAX_ALLOWED_WAIT_TIME) {
             this.delay(MAX_ALLOWED_WAIT_TIME);
             amount -= MAX_ALLOWED_WAIT_TIME;
         }
         this.delay(amount);
 	}
 
-        /**
-         * Executes commands using given parameters.
-         * If parameter-less command is received, it is passed to the command() method.
-         * 
-         * @param command
-         */
-        public void execute(String command) {
-            if (command == null || "".equals(command.trim()) || command.trim().startsWith(COMMENT_SYMBOL)) {
-                return;
-            }
-            //Split the line btwn the command and its value, split on the ":" symbol
-            //command is normalized and the value is taken raw
-            String cmd = null;
-            String val = null;
-            if (command.indexOf(':') != -1) {
-                cmd = command.substring(0,command.indexOf(':'));
-                val = command.substring(command.indexOf(':')+1);
-            }
-            else {
-                command(command.trim());
-                return;
-            }
-            
-            cmd = cmd.toLowerCase().trim();
+	/**
+	 * Executes commands using given parameters.
+	 * If parameter-less command is received, it is passed to the command() method.
+	 *
+	 * @param command found at current line of script. Expect form of "command:value"
+	 */
+	public void execute(String command) throws IOException, NativeHookException {
+		if (command == null || "".equals(command.trim()) || command.trim().startsWith(COMMENT_SYMBOL)) {
+			return;
+		}
+		//Split the line btwn the command and its value, split on the ":" symbol
+		//command is normalized and the value is taken raw
+		String cmd;
+		String val;
+		if (command.indexOf(':') != -1) {
+			cmd = command.substring(0, command.indexOf(':'));
+			val = command.substring(command.indexOf(':') + 1);
+		} else {
+			command(command.trim());
+			return;
+		}
 
-            if ("wait".equals(cmd))
-            {
-            	wait(val);
-            }
-            else if ("type".equals(cmd))
-            {
-                this.typeLiteralString(val);
-            }
-            else if ("press".equals(cmd))
-            {
-                this.hitSimultaneousKeysPlusDelimited(val);
-            }
-            else if ("hold".equals(cmd))
-            {
-                this.hold(val);
-            }
-            else if ("release".equals(cmd))
-            {
-                this.release(val);
-            }
-            else if ("moveto".equals(cmd))
-            {
-                String [] pos = val.split(",");
-                int x = Integer.parseInt(pos[0]);
-                int y = Integer.parseInt(pos[1]);
+		cmd = cmd.toLowerCase().trim();
 
-                this.mouseMove(x, y);
-            }
-            /*
-            else if("mclick".equals(cmd))
-            {
-                this.mousePress(InputEvent.BUTTON3_MASK);
-                this.mouseRelease(InputEvent.BUTTON3_MASK);
-            }*/
-            else if ("run".equals(cmd))
-            {
-				runApplication(val);
-            }
-            else if ("enter".equals(cmd)){
-            	enterLiteralString(val);
-            }
-            else if ("cmd".equals(cmd))
-            {
-                this.command(val.trim());
-            }
-            else if ("multicmd".equals(cmd))
-            {
-                String [] pos = val.split(",");
-                String c = pos[0].trim();
-                int i = Integer.parseInt(pos[1].trim());
+		if ("wait".equals(cmd)) {
+			wait(val);
+		} else if ("type".equals(cmd)) {
+			this.typeLiteralString(val);
+		} else if ("press".equals(cmd)) {
+			this.hitSimultaneousKeysPlusDelimited(val);
+		} else if ("hold".equals(cmd)) {
+			this.hold(val);
+		} else if ("release".equals(cmd)) {
+			this.release(val);
+		} else if ("moveto".equals(cmd)) {
+			String[] pos = val.split(",");
+			int x = Integer.parseInt(pos[0]);
+			int y = Integer.parseInt(pos[1]);
 
-                this.command(c, i);
-            }
-            else if ("multipress".equals(cmd))
-            {
-                String [] pos = val.split(",");
-                String c = pos[0].trim();
-                int i = Integer.parseInt(pos[1].trim());
+			this.mouseMove(x, y);
+		} else if ("run".equals(cmd)) {
+			runApplication(val);
+		} else if ("enter".equals(cmd)) {
+			enterLiteralString(val);
+		} else if ("cmd".equals(cmd)) {
+			this.command(val.trim());
+		} else if ("multicmd".equals(cmd)) {
+			String[] pos = val.split(",");
+			String c = pos[0].trim();
+			int i = Integer.parseInt(pos[1].trim());
+			this.command(c, i);
+		} else if ("multipress".equals(cmd)) {
+			String[] pos = val.split(",");
+			String c = pos[0].trim();
+			int i = Integer.parseInt(pos[1].trim());
 
-                this.press(c, i);
-            }
-            else if ("login".equals(cmd))
-            {
-                String [] pos = val.split(",");
-                String name = pos[0]; // no trim here since username/pw made include whitespace
-                String pw = pos[1];
+			this.press(c, i);
+		} else if ("login".equals(cmd)) {
+			String[] pos = val.split(",");
+			String name = pos[0]; // no trim here since username/pw made include whitespace
+			String pw = pos[1];
 
-                this.login(name, pw);
-            }
-            else if ("chooseoption".equals(cmd))
-            {
-                val = val.trim();
-                int v = Integer.parseInt(val);
-                this.chooseOption(v);
-            }
-        }
+			this.login(name, pw);
+		} else if ("chooseoption".equals(cmd)) {
+			val = val.trim();
+			int v = Integer.parseInt(val);
+			this.chooseOption(v);
+		}
+	}
 
-        public void login(String name, String pw)
-        {
+        private void login(String name, String pw) {
             this.typeLiteralString(name);
             this.delay(100);
             this.keyPress(KeyEvent.VK_TAB);
@@ -726,12 +645,9 @@ public class SuperRobot extends Robot implements NativeKeyListener
             this.keyRelease(KeyEvent.VK_ENTER);
         }
 
-        public void chooseOption(int num)
-        {
+        private void chooseOption(int num) {
             int val = num-1;
-
-            for (int i = 0; i < val; i++)
-            {
+            for (int i = 0; i < val; i++) {
                 keyPress(KeyEvent.VK_RIGHT);
                 this.delay(100);
             }
@@ -740,34 +656,19 @@ public class SuperRobot extends Robot implements NativeKeyListener
         
         /**
          * Block current thread until we detect the enter key has been pressed
-         * @return 
          */
-        public void waitForEnter() {
-        	// Initialze native hook.
-            try {
-                GlobalScreen.registerNativeHook();
-            }
-            catch (NativeHookException ex) {
-                System.err.println("There was a problem registering the native hook.");
-                System.err.println(ex.getMessage());
-                ex.printStackTrace();
-                System.exit(1);
-            }
-
+		private void waitForEnter() throws NativeHookException {
+        	// Initialize native hook.
+			GlobalScreen.registerNativeHook();
             GlobalScreen.addNativeKeyListener(this);
             enterPressed = false;
-            
-            while(!enterPressed) {
-            	//just wait
-            }
-            System.out.println("Continuing");
+
+			//noinspection StatementWithEmptyBody
+			while(!enterPressed) {/*just wait*/}
         }
 
 		@Override
-		public void nativeKeyPressed(NativeKeyEvent arg0) {
-			// TODO Auto-generated method stub
-			
-		}
+		public void nativeKeyPressed(NativeKeyEvent arg0) {}
 
 		@Override
 		public void nativeKeyReleased(NativeKeyEvent e) {
@@ -784,32 +685,20 @@ public class SuperRobot extends Robot implements NativeKeyListener
 		}
 
 		@Override
-		public void nativeKeyTyped(NativeKeyEvent arg0) {
-			// TODO Auto-generated method stub
-			
-		}
+		public void nativeKeyTyped(NativeKeyEvent arg0) {}
 
 	/**
 	 * Will execute file at given path, returning true if successful
 	 *
-	 * @param path
+	 * @param path of Application to run
 	 * @return true if successful
 	 */
-	public static boolean runApplication(String path)
-	{
-		try {
-			if (path.endsWith(".lnk")) { //separate process for shortcuts
-				new ProcessBuilder("cmd", "/c", path).start();
-			} else {
-				new ProcessBuilder(path).start();
-			}
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return false;
+	private boolean runApplication(String path) throws IOException {
+		if (path.endsWith(".lnk")) { //separate process for shortcuts
+			new ProcessBuilder("cmd", "/c", path).start();
+		} else {
+			new ProcessBuilder(path).start();
 		}
-
 		return true;
 	}
 }

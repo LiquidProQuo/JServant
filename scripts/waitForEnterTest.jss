@@ -1,0 +1,1 @@
+run:Notepad.exewait:2000type:Script will wait here until the "Enter" key is pressed.waitForEnterenter:Enter Detected!wait:500type:Closing!wait:500closeAppwait:100chooseoption:2

@@ -77,13 +77,13 @@
                     <div class="form-group">
                         <select class="form-control" id="scriptSelect" onchange="loadScript();"
                                 ng-model="currentScriptName">
-                            <option>(None)</option>
+                            <option>{{NONE_SELECTED_TEXT}}</option>
                         </select>
                     </div>
                     <div class="form-group text-center">
-                        <button class="btn btn-danger btn-lg" type="button" onclick="stopScript();">Stop</button>
+                        <button class="btn btn-danger btn-lg" type="button" ng-click="stopScript();">Stop</button>
                         <div class="divider"></div>
-                        <button class="btn btn-info btn-lg" type="button" onclick="runScript();">Run</button>
+                        <button class="btn btn-info btn-lg" type="button" ng-click="runScript()">Run</button>
                     </div>
                 </div>
             </fieldset>

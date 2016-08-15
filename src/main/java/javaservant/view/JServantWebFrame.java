@@ -25,9 +25,9 @@ public class JServantWebFrame {
 	private static final String JAVASCRIPT_BRIDGE_NAME = "javaServant";
 	private static final String WEB_PATH = "web/main.html";
 
-	Bridge bridge;
-	WebEngine webEngine;
-	Stage primaryStage;
+	private Bridge bridge;
+	private WebEngine webEngine;
+	private Stage primaryStage;
 
 	public void init(JavaServant js, Stage primaryStage) throws MalformedURLException, URISyntaxException {
 		this.primaryStage = primaryStage;
@@ -62,17 +62,13 @@ public class JServantWebFrame {
 		webEngine.executeScript("updateScriptStatus('" + runState + "');");
 	}
 
-	public void resize(Integer width, Integer height) {
+	private void resize(Integer width, Integer height) {
 		if (width != null) {
 			primaryStage.setWidth(width);
 		}
 		if (height != null) {
 			primaryStage.setHeight(height);
 		}
-	}
-
-	public double getHeight() {
-		return primaryStage.getHeight();
 	}
 
 	public double getWidth() {
@@ -91,6 +87,11 @@ public class JServantWebFrame {
 
 	public void resetFrame() {
 		populateVariables(Collections.EMPTY_LIST);
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> T getClientVariable(String variableName) {
+		return (T) webEngine.executeScript("variableName");
 	}
 
 }

@@ -1,0 +1,3 @@
+I can say modifiedTrickyVar. I can also say 12345_Modified_$
+Colons used after the initial will not confuse script, e.g: modifiedTrickyVar:12345_Modified_$! 
+var2 retains it's original value: 12345_Modified_$

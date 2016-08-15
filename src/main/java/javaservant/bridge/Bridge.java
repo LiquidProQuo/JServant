@@ -1,16 +1,12 @@
 package javaservant.bridge;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import javaservant.core.JavaServant;
-import javaservant.view.JServantWebFrame;
-import netscape.javascript.JSObject;
-
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javaservant.core.JavaServant;
+import javaservant.view.JServantWebFrame;
 
 /**
  * Created by Josh on 7/17/2016.
@@ -25,18 +21,18 @@ public class Bridge {
 	}
 
 	public void runScript() {
-		System.out.println("Run Script Called!");
-		boolean success = js.runScript();
+		//System.out.println(variableMap);
+		//String val1 = frame.getClientVariable("getAngularControllerScope().vars[0].value");
+		//System.out.println(val1);
+		js.runScript();
 	}
 
 	public void stopScript() {
-		System.out.println("Stop Script Called!");
 		js.stopScript();
 	}
 
 	public void loadScript(String selectedScript) {
-		System.out.println("Load Script Called!: " + selectedScript.toString());
-		File script = js.loadDropDownScriptGetFile(selectedScript.toString(), selectedScript.toString());
+		File script = js.loadDropDownScriptGetFile(selectedScript, selectedScript);
 		if (script == null || !script.exists()) {
 			frame.resetFrame();
 			return;
@@ -62,5 +58,9 @@ public class Bridge {
 
 	public void updateScriptRunState() {
 		frame.updateRunState(js.getThreadStateDescription());
+	}
+
+	public void updateVariableMap(String name, String value) {
+		js.updateVariableMap(name, value);
 	}
 }

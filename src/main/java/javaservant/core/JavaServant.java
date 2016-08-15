@@ -31,10 +31,10 @@ public class JavaServant extends Application {
     private static final boolean USE_WEB_VIEW = true;
 	private static final String NONE = "(None)";
 	public static final String NO_SCRIPT_TEXT = "No Script Currently Loaded.";
-	private static final String SCRIPT_EXTENSION = "txt"; //TODO: maybe different extension
+	private static final String SCRIPT_EXTENSION = "jss";
 	private static final String SCRIPT_EXTENSION_TITLE = "JServant Scripts";
 	public static final String DEFAULT_FILE_DIRECTORY = "scripts";
-	public static final String APP_VERSION = "0.5 (Beta)";
+	private static final String APP_VERSION = "0.6 (Beta)";
 	public static final String FRAME_TITLE = "Java Servant " + APP_VERSION;
 	private final static Logger LOG = Logger.getLogger(JavaServant.class.getName());
 
@@ -52,6 +52,8 @@ public class JavaServant extends Application {
     private File script;
     private JSThread thread;
 	private volatile static SCRIPT_STATE scriptState;
+
+	private Map<String, String> variableReplacementMap;
     
     
     public JavaServant() {
@@ -62,10 +64,11 @@ public class JavaServant extends Application {
         	handler.setFormatter(new SimpleFormatter());
         	
             bot = new SuperRobot();
+			variableReplacementMap = new HashMap<>();
         } catch(Exception e) {
         	LOG.log(Level.SEVERE, "Fatal Error!: " + e.getMessage());
             e.printStackTrace();
-            System.exit(0);
+            System.exit(1);
         }
     }
 
@@ -148,26 +151,21 @@ public class JavaServant extends Application {
         String str = currText;
 
         int approveVal = chooser.showOpenDialog(frame);
-        if(approveVal == JFileChooser.APPROVE_OPTION)
-        {
-            //System.out.println("You chose to open this file: " +
-           // chooser.getSelectedFile().getName());
+        if(approveVal == JFileChooser.APPROVE_OPTION) {
             str = chooser.getSelectedFile().getName();
         }
 
-        if(chooser.getSelectedFile() == null) //somehow?
-        {
+        if(chooser.getSelectedFile() == null) { //somehow?
             str = currText;
         }
-        else
-        {
+        else {
             script = chooser.getSelectedFile();
         }
         
         return str; 
     }
     
-    public void loadScriptFromFileName(String filePath) {
+    private void loadScriptFromFileName(String filePath) {
     	File file = new File(filePath);
     	if (!file.exists()) {
     		LOG.warning("File at " +  filePath + " does not exist! Exiting.");
@@ -201,9 +199,8 @@ public class JavaServant extends Application {
 
 	//TODO: scaffolding
 	public File loadDropDownScriptGetFile(String currText, String fileName) {
-		String  str = currText;
-		if(fileName != null) {
-			if(NONE.equals(fileName)) {
+		if (fileName != null) {
+			if (NONE.equals(fileName)) {
 				script = null;
 				JavaServant.setScriptState(SCRIPT_STATE.NONE);
 			} else {
@@ -220,9 +217,9 @@ public class JavaServant extends Application {
 	}
 
     public boolean runScript() {
-        if(script != null && (thread == null || !thread.running)) {
+        if (script != null && (thread == null || !thread.running)) {
         	LOG.info("New Thread request to start running via start button.");
-            thread = new JSThread(bot, script);
+            thread = new JSThread(bot, script, variableReplacementMap);
             thread.start();
 			return true;
         }
@@ -251,14 +248,6 @@ public class JavaServant extends Application {
     		js.runScript();
     	}
     }
-
-	public JSThread getThread() {
-		return thread;
-	}
-
-	public SCRIPT_STATE getScriptState() {
-		return scriptState;
-	}
 
 	public synchronized static void setScriptState(SCRIPT_STATE newState) {
 		scriptState = newState;
@@ -290,5 +279,9 @@ public class JavaServant extends Application {
 		}
 
 		return varMap;
+	}
+
+	public void updateVariableMap(String name, String value) {
+		variableReplacementMap.put(name, value);
 	}
 }
